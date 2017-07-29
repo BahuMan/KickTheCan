@@ -9,11 +9,11 @@ public class TagGameController : NetworkBehaviour {
     private float gameStateCheckInterval = 5;
 
     private List<PlayerController> playerList = new List<PlayerController>(10);
-    private PlayerController currentIt;
+    private PlayerController currentIt = null;
 
-    [ServerCallback]
-    private void Start()
+    override public void OnStartServer()
     {
+        Debug.Log("Starting coroutine");
         StartCoroutine(PeriodicalCheck());
     }
 
@@ -31,7 +31,11 @@ public class TagGameController : NetworkBehaviour {
     {
         playerList.RemoveAll(AllDisconnectedPlayers);
 
-        if (playerList.Count == 0) return;
+        if (playerList.Count == 0)
+        {
+            Debug.Log("Server couldn't find players. No game state");
+            return;
+        }
 
         if (currentIt == null)
         {
@@ -39,12 +43,16 @@ public class TagGameController : NetworkBehaviour {
             currentIt = playerList[Random.Range(0, playerList.Count)];
             StartNewRound();
         }
-        else if (playerList.TrueForAll(AllPlayersTagged))
+        else if (playerList.TrueForAll(AllPlayersTaggedOrIT))
         {
             Debug.Log("All players tagged; assigning new IT and restarting round");
-            List<PlayerController> tagged = playerList.FindAll(AllPlayersTagged);
+            List<PlayerController> tagged = playerList.FindAll(AllPlayersTaggedOrIT);
             currentIt = tagged[Random.Range(0, tagged.Count)];
             StartNewRound();
+        }
+        else
+        {
+            Debug.Log("Gamestate: found " + playerList.Count + " players, of which tagged " + playerList.FindAll(AllPlayersTaggedOrIT).Count);
         }
     }
 
@@ -56,19 +64,19 @@ public class TagGameController : NetworkBehaviour {
         {
             if (currentIt == pc)
             {
-                pc.PlayerIsIt();
+                pc.status = PlayerController.TagStatus.IT;
             }
             else
             {
-                pc.PlayerIsHiding();
+                pc.status = PlayerController.TagStatus.HIDING;
             }
         }
     }
 
     //used to check the generic list:
-    private static bool AllPlayersTagged(PlayerController pc)
+    private static bool AllPlayersTaggedOrIT(PlayerController pc)
     {
-        return pc.IsPlayerTagged();
+        return pc.GetStatus() == PlayerController.TagStatus.TAGGED || pc.GetStatus() == PlayerController.TagStatus.IT;
     }
 
     //used to cull the generic list:
@@ -77,17 +85,20 @@ public class TagGameController : NetworkBehaviour {
         return (pc == null);
     }
 
+    [Server]
     public void RegisterPlayer(PlayerController pc)
     {
         playerList.Add(pc);
-        if (!currentIt)
+        /*
+        if (currentIt == null)
         {
-            currentIt = pc;
-            pc.PlayerIsIt();
+            Debug.Log("First player registered is IT");
+            currentIt.status = PlayerController.TagStatus.IT;
         }
         else
         {
-            pc.PlayerIsHiding();
+            currentIt.status = PlayerController.TagStatus.IT;
         }
+        */
     }
 }

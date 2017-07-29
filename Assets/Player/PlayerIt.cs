@@ -14,6 +14,8 @@ public class PlayerIt : NetworkBehaviour
     private GameObject muzzleFlashPrefab;
     [SerializeField]
     private Transform muzzleLocation;
+    [SerializeField]
+    private TaggedAreaControl tagArea;
 
     private float earliestNewShot = 0f;
 
@@ -40,7 +42,12 @@ public class PlayerIt : NetworkBehaviour
         bool hitSomething = Physics.Raycast(ray, out hit, shootMaxDistance);
         if (hitSomething)
         {
-            //if player was hit, that player is now captured
+            PlayerController player = hit.transform.gameObject.GetComponent<PlayerController>();
+            if (player != null)
+            {
+                //if player was hit, that player is now captured
+                tagArea.AddTaggedPlayer(player);
+            }
         }
 
         RpcProcessShotEffect(hitSomething, hit.point);

@@ -37,7 +37,7 @@ public class PlayerController : NetworkBehaviour
 
     public enum TagStatus { IT, TAGGED, HIDING };
 
-    [SyncVar]
+    [SyncVar(hook="SetStatus")]
     public TagStatus status;
 
     private GameObject globalCamera;
@@ -49,16 +49,21 @@ public class PlayerController : NetworkBehaviour
         globalCamera = Camera.main.gameObject;
         EnablePlayer(true);
 
-        GameCTRL = GameObject.FindGameObjectWithTag("GameController").GetComponent<TagGameController>();
+    }
+
+    public override void OnStartServer()
+    {
+        GameObject go = GameObject.FindGameObjectWithTag("GameController");
+        GameCTRL = go.GetComponent<TagGameController>();
         GameCTRL.RegisterPlayer(this);
     }
 
     private void EnablePlayer(bool enabled)
     {
+        networkOptions.onToggleShared.Invoke(enabled);
         if (isLocalPlayer)
         {
             globalCamera.SetActive(!enabled);
-            networkOptions.onToggleShared.Invoke(enabled);
             networkOptions.onToggleLocal.Invoke(enabled);
         }
         else
@@ -67,13 +72,24 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    private void SetStatus(TagStatus value)
+    {
+        this.status = value;
+        switch (this.status)
+        {
+            case TagStatus.HIDING: this.PlayerIsHiding(); break;
+            case TagStatus.IT: this.PlayerIsIt(); break;
+            case TagStatus.TAGGED: this.PlayerIsTagged(); break;
+        }
+    }
+
     /**
      * There are three different statuses for a player to be in.
      * Based on any of these statuses, certain components will need to be activated/deactivated
      */
-    [Server]
-    public void PlayerIsIt()
+    private void PlayerIsIt()
     {
+        Debug.Log("Player IT assigned");
         status = TagStatus.IT;
 
         statusChanges.onTogglePlayerTagged.Invoke(false);
@@ -82,8 +98,7 @@ public class PlayerController : NetworkBehaviour
         statusChanges.onTogglePlayerIt.Invoke(true);
     }
 
-    [Server]
-    public void PlayerIsHiding()
+    private void PlayerIsHiding()
     {
         status = TagStatus.HIDING;
 
@@ -93,8 +108,7 @@ public class PlayerController : NetworkBehaviour
         statusChanges.onTogglePlayerHiding.Invoke(true);
     }
 
-    [Server]
-    public void PlayerIsTagged()
+    private void PlayerIsTagged()
     {
         status = TagStatus.TAGGED;
 
