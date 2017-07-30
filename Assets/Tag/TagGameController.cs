@@ -39,20 +39,18 @@ public class TagGameController : NetworkBehaviour {
 
         if (currentIt == null)
         {
-            Debug.Log("Current IT quit the server; assigning new random IT");
             currentIt = playerList[Random.Range(0, playerList.Count)];
             StartNewRound();
         }
         else if (playerList.TrueForAll(AllPlayersTaggedOrIT))
         {
-            Debug.Log("All players tagged; assigning new IT and restarting round");
             List<PlayerController> tagged = playerList.FindAll(AllPlayersTaggedOrIT);
             currentIt = tagged[Random.Range(0, tagged.Count)];
             StartNewRound();
         }
         else
         {
-            Debug.Log("Gamestate: found " + playerList.Count + " players, of which tagged " + playerList.FindAll(AllPlayersTaggedOrIT).Count);
+            //game is on; no change
         }
     }
 

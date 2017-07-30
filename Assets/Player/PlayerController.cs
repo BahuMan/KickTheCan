@@ -42,6 +42,8 @@ public class PlayerController : NetworkBehaviour
 
     private GameObject globalCamera;
     private TagGameController GameCTRL;
+    private HUDControl HUD;
+
 
 
     private void Start()
@@ -54,6 +56,7 @@ public class PlayerController : NetworkBehaviour
     public override void OnStartServer()
     {
         GameObject go = GameObject.FindGameObjectWithTag("GameController");
+        HUD = go.GetComponent<HUDControl>();
         GameCTRL = go.GetComponent<TagGameController>();
         GameCTRL.RegisterPlayer(this);
     }
@@ -89,7 +92,7 @@ public class PlayerController : NetworkBehaviour
      */
     private void PlayerIsIt()
     {
-        Debug.Log("Player IT assigned");
+        HUD.DisplayGameMessage("You're IT!", 5f);
         status = TagStatus.IT;
 
         statusChanges.onTogglePlayerTagged.Invoke(false);
@@ -100,6 +103,7 @@ public class PlayerController : NetworkBehaviour
 
     private void PlayerIsHiding()
     {
+        HUD.DisplayGameMessage("Go HIDE!", 5f);
         status = TagStatus.HIDING;
 
         statusChanges.onTogglePlayerIt.Invoke(false);
@@ -110,6 +114,7 @@ public class PlayerController : NetworkBehaviour
 
     private void PlayerIsTagged()
     {
+        HUD.DisplayGameMessage("You've been tagged ...", 15f);
         status = TagStatus.TAGGED;
 
         statusChanges.onTogglePlayerIt.Invoke(false);

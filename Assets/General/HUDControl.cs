@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 
@@ -13,6 +14,8 @@ public class HUDControl : NetworkBehaviour {
 
     [SerializeField]
     private KeyCode ChatHotkey = KeyCode.Return;
+    [SerializeField]
+    private KeyCode ChatEscape = KeyCode.Escape;
 
     private bool isChatting = false;
 
@@ -23,14 +26,63 @@ public class HUDControl : NetworkBehaviour {
         ChatInput =     GameObject.Find("ChatInput").GetComponent<InputField>();
     }
 
-    private void Update()
+    private void Start()
     {
-        if (isChatting) return; //don't listen for hotkey
-
-        if (Input.GetKeyDown(ChatHotkey))
-        {
-            ChatInput.ActivateInputField();
-        }
+        //ChatInput. add listeners?
     }
 
+    private void Update()
+    {
+        if (isChatting)
+        {
+            if (Input.GetKeyDown(ChatEscape)) {
+                Debug.Log("ESC is considered cancel");
+                ChatInput.CancelInvoke();
+                ChatInput.DeactivateInputField();
+                isChatting = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Return)) //return is hardcoded for submitting chatline
+            {
+                Debug.Log("Enter is considered submit");
+                isChatting = false;
+                ChatInput.DeactivateInputField();
+                this.AddChatLine(ChatInput.text);
+                
+            }
+        }
+        else
+        {
+            if (Input.GetKeyDown(ChatHotkey))
+            {
+                ChatInput.ActivateInputField();
+                isChatting = true;
+            }
+        }
+
+    }
+
+    public void AddChatLine(string chatLine)
+    {
+        ChatLog.text += chatLine;
+    }
+
+    public void OnSubmit(UnityEngine.EventSystems.BaseEventData eventData)
+    {
+        Debug.Log("OnSubmit");
+        isChatting = false;
+        ChatInput.DeactivateInputField();
+        this.AddChatLine(ChatInput.text);
+    }
+
+    public void DisplayGameMessage(string msg, float time)
+    {
+        StartCoroutine(TimedMessage(msg, time));
+    }
+
+    private IEnumerator TimedMessage(string msg, float time)
+    {
+        GameMessage.text = msg;
+        yield return new WaitForSeconds(time);
+        GameMessage.text = "";
+    }
 }
