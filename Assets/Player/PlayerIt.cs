@@ -14,11 +14,15 @@ public class PlayerIt : NetworkBehaviour
     private GameObject muzzleFlashPrefab;
     [SerializeField]
     private Transform muzzleLocation;
-    [SerializeField]
-    private TaggedAreaControl tagArea;
 
+
+    private TaggedAreaControl tagArea;
     private float earliestNewShot = 0f;
 
+    private void Start()
+    {
+        tagArea = GameObject.FindGameObjectWithTag("TagArea").GetComponent<TaggedAreaControl>();
+    }
 
     private void Update()
     {
@@ -47,6 +51,7 @@ public class PlayerIt : NetworkBehaviour
             {
                 //if player was hit, that player is now captured
                 tagArea.AddTaggedPlayer(player);
+                player.status = PlayerController.TagStatus.TAGGED;
             }
         }
 

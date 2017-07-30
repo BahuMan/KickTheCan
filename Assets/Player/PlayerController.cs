@@ -127,4 +127,12 @@ public class PlayerController : NetworkBehaviour
     {
         return this.status;
     }
+
+    public void Teleport (Vector3 newPosition)
+    {
+        if (hasAuthority)
+        {
+            transform.position = newPosition;
+        }
+    }
 }
