@@ -13,7 +13,6 @@ public class TagGameController : NetworkBehaviour {
 
     override public void OnStartServer()
     {
-        Debug.Log("Starting coroutine");
         StartCoroutine(PeriodicalCheck());
     }
 

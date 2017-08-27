@@ -56,9 +56,14 @@ public class PlayerController : NetworkBehaviour
     public override void OnStartServer()
     {
         GameObject go = GameObject.FindGameObjectWithTag("GameController");
-        HUD = go.GetComponent<HUDControl>();
         GameCTRL = go.GetComponent<TagGameController>();
         GameCTRL.RegisterPlayer(this);
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        GameObject go = GameObject.FindGameObjectWithTag("GameController");
+        HUD = go.GetComponent<HUDControl>();
     }
 
     private void EnablePlayer(bool enabled)
@@ -73,8 +78,12 @@ public class PlayerController : NetworkBehaviour
         {
             networkOptions.onToggleRemote.Invoke(enabled);
         }
+
+        //since a newly spawned object doesn't trigger syncvar hooks, I'm explicitly setting the status again
+        SetStatus(this.status);
     }
 
+    //this method is a network hook for the SyncVar "status"
     private void SetStatus(TagStatus value)
     {
         this.status = value;
@@ -92,8 +101,7 @@ public class PlayerController : NetworkBehaviour
      */
     private void PlayerIsIt()
     {
-        HUD.DisplayGameMessage("You're IT!", 5f);
-        status = TagStatus.IT;
+        if (isLocalPlayer) HUD.DisplayGameMessage("You're IT!", 5f);
 
         statusChanges.onTogglePlayerTagged.Invoke(false);
         statusChanges.onTogglePlayerHiding.Invoke(false);
@@ -103,8 +111,7 @@ public class PlayerController : NetworkBehaviour
 
     private void PlayerIsHiding()
     {
-        HUD.DisplayGameMessage("Go HIDE!", 5f);
-        status = TagStatus.HIDING;
+        if (isLocalPlayer) HUD.DisplayGameMessage("Go HIDE!", 5f);
 
         statusChanges.onTogglePlayerIt.Invoke(false);
         statusChanges.onTogglePlayerTagged.Invoke(false);
@@ -114,8 +121,7 @@ public class PlayerController : NetworkBehaviour
 
     private void PlayerIsTagged()
     {
-        HUD.DisplayGameMessage("You've been tagged ...", 15f);
-        status = TagStatus.TAGGED;
+        if (isLocalPlayer) HUD.DisplayGameMessage("You've been tagged ...", 15f);
 
         statusChanges.onTogglePlayerIt.Invoke(false);
         statusChanges.onTogglePlayerHiding.Invoke(false);
