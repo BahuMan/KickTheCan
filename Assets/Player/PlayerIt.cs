@@ -37,7 +37,7 @@ public class PlayerIt : NetworkBehaviour
     }
 
     [Command]
-    void CmdShoot(Vector3 origin, Vector3 direction)
+    public void CmdShoot(Vector3 origin, Vector3 direction)
     {
         RaycastHit hit;
         Ray ray = new Ray(origin, direction);
@@ -50,8 +50,8 @@ public class PlayerIt : NetworkBehaviour
             if (player != null)
             {
                 //if player was hit, that player is now captured
-                tagArea.AddTaggedPlayer(player);
                 player.status = PlayerController.TagStatus.TAGGED;
+                tagArea.AddTaggedPlayer(player); //if the "tagged" status hasn't been propagated yet, the TagArea may conclude that everyone has been freed
             }
         }
 

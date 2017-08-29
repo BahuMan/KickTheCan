@@ -46,11 +46,20 @@ public class PlayerController : NetworkBehaviour
 
 
 
-    private void Start()
+    public void Start()
     {
+        GameObject go = GameObject.FindGameObjectWithTag("HUD");
+        HUD = go.GetComponent<HUDControl>();
+        if (isLocalPlayer)
+        {
+            //every player can send new messages to chat box,
+            //but only local player should listen for new
+            //text input and broadcast that
+            HUD.OnSendMessage += OnSendChatMessage;
+        }
+
         globalCamera = Camera.main.gameObject;
         EnablePlayer(true);
-
     }
 
     public override void OnStartServer()
@@ -58,12 +67,6 @@ public class PlayerController : NetworkBehaviour
         GameObject go = GameObject.FindGameObjectWithTag("GameController");
         GameCTRL = go.GetComponent<TagGameController>();
         GameCTRL.RegisterPlayer(this);
-    }
-
-    public override void OnStartLocalPlayer()
-    {
-        GameObject go = GameObject.FindGameObjectWithTag("GameController");
-        HUD = go.GetComponent<HUDControl>();
     }
 
     private void EnablePlayer(bool enabled)
@@ -139,11 +142,30 @@ public class PlayerController : NetworkBehaviour
         return this.status;
     }
 
-    public void Teleport (Vector3 newPosition)
+    [ClientRpc]
+    public void RpcTeleport (Vector3 newPosition)
     {
         if (hasAuthority)
         {
             transform.position = newPosition;
         }
+    }
+
+    private void OnSendChatMessage(string msg)
+    {
+        //this delegate should be called from the chat box, and only if this player was local and registered itself
+        CmdBroadcastChatMessage(msg);
+    }
+
+    [Command]
+    private void CmdBroadcastChatMessage(string msg)
+    {
+        RpcBroadcastChatMessage(msg);
+    }
+
+    [ClientRpc]
+    private void RpcBroadcastChatMessage(string msg)
+    {
+        this.HUD.AddChatLine(msg);
     }
 }

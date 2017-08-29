@@ -19,16 +19,14 @@ public class HUDControl : NetworkBehaviour {
 
     private bool isChatting = false;
 
+    public delegate void SendMessageEvent(string msg);
+    public event SendMessageEvent OnSendMessage;
+
     private void Reset()
     {
         GameMessage =   GameObject.Find("GameMessage").GetComponent<Text>();
         ChatLog =       GameObject.Find("ChatLog").GetComponent<Text>();
         ChatInput =     GameObject.Find("ChatInput").GetComponent<InputField>();
-    }
-
-    private void Start()
-    {
-        //ChatInput. add listeners?
     }
 
     private void Update()
@@ -46,8 +44,8 @@ public class HUDControl : NetworkBehaviour {
                 Debug.Log("Enter is considered submit");
                 isChatting = false;
                 ChatInput.DeactivateInputField();
-                this.AddChatLine(ChatInput.text);
-                
+                //this.CmdAddChatLine(ChatInput.text);
+                if (OnSendMessage != null) OnSendMessage(ChatInput.text);
             }
         }
         else
@@ -63,6 +61,8 @@ public class HUDControl : NetworkBehaviour {
 
     public void AddChatLine(string chatLine)
     {
+        //@TODO: sanitize & censorize
+        //@TODO: possible duplicate lines when host is also a player?
         ChatLog.text += chatLine;
     }
 
@@ -71,7 +71,8 @@ public class HUDControl : NetworkBehaviour {
         Debug.Log("OnSubmit");
         isChatting = false;
         ChatInput.DeactivateInputField();
-        this.AddChatLine(ChatInput.text);
+        //this.CmdAddChatLine(ChatInput.text);
+        if (OnSendMessage != null) OnSendMessage(ChatInput.text);
     }
 
     public void DisplayGameMessage(string msg, float time)

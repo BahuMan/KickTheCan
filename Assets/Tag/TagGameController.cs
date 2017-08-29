@@ -38,14 +38,17 @@ public class TagGameController : NetworkBehaviour {
 
         if (currentIt == null)
         {
-            currentIt = playerList[Random.Range(0, playerList.Count)];
-            StartNewRound();
+            StartNewRound(playerList[Random.Range(0, playerList.Count)]);
+        }
+        else if (currentIt.GetStatus() != PlayerController.TagStatus.IT)
+        {
+            Debug.LogError("BUG: current IT is " + currentIt.name + " but doesn't have correct status");
+            StartNewRound(currentIt);
         }
         else if (playerList.TrueForAll(AllPlayersTaggedOrIT))
         {
             List<PlayerController> tagged = playerList.FindAll(AllPlayersTaggedOrIT);
-            currentIt = tagged[Random.Range(0, tagged.Count)];
-            StartNewRound();
+            StartNewRound(tagged[Random.Range(0, tagged.Count)]);
         }
         else
         {
@@ -54,8 +57,9 @@ public class TagGameController : NetworkBehaviour {
     }
 
     [Server]
-    private void StartNewRound()
+    private void StartNewRound(PlayerController it)
     {
+        currentIt = it;
         //@TODO: reset positions?
         foreach (PlayerController pc in playerList)
         {
@@ -98,4 +102,11 @@ public class TagGameController : NetworkBehaviour {
         }
         */
     }
+
+    public IEnumerable<PlayerController> AllPlayers()
+    {
+        playerList.RemoveAll(AllDisconnectedPlayers);
+        return playerList;
+    }
+
 }

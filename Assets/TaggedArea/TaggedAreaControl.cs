@@ -15,13 +15,19 @@ public class TaggedAreaControl : NetworkBehaviour
     [SerializeField]
     private List<GameObject> barriers = new List<GameObject>(4);
 
+    private HUDControl _hud;
     private List<PlayerController> playerList = new List<PlayerController>(10);
+
+    public override void OnStartLocalPlayer()
+    {
+        _hud = GameObject.FindGameObjectWithTag("HUD").GetComponent<HUDControl>();
+    }
 
     [Server]
     public void AddTaggedPlayer(PlayerController playa)
     {
         playerList.Add(playa);
-        playa.Teleport(transform.position);
+        playa.RpcTeleport(transform.position);
     }
 
     [ServerCallback]
@@ -31,16 +37,22 @@ public class TaggedAreaControl : NetworkBehaviour
         if (player == null) return;
         if (player.IsPlayerTagged()) return;
 
+        if (playerList.Contains(player))
+        {
+            Debug.LogError("someone was added but doesn't have status 'TAGGED' yet: " + player.name);
+            return;
+        }
+
+        //change status for everyone currently in the area, and let them go hide again:
         foreach(PlayerController p in playerList)
         {
             if (p != null)
             {
-                p.status = PlayerController.TagStatus.TAGGED;
-                p.transform.position = this.transform.position;
+                p.status = PlayerController.TagStatus.HIDING;
             }
         }
+        playerList.Clear();
 
-        Debug.Log("Server releasing all");
         RpcReleaseAll();
     }
 
@@ -48,14 +60,16 @@ public class TaggedAreaControl : NetworkBehaviour
     public void RpcReleaseAll()
     {
         StartCoroutine(TempUnlock());
+        if (isLocalPlayer)
+        {
+            _hud.DisplayGameMessage("Everyone has been freed, HIDE!", 1f);
+        }
     }
 
     private IEnumerator TempUnlock()
     {
-        Debug.Log("Client unlock");
         Lockdown(false);
         yield return new WaitForSeconds(this.UnlockPeriod);
-        Debug.Log("Client lock");
         Lockdown(true);
     }
 
