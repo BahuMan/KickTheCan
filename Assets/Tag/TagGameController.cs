@@ -57,6 +57,12 @@ public class TagGameController : NetworkBehaviour {
     }
 
     [Server]
+    public void CheatRequestIt(PlayerController it)
+    {
+        StartNewRound(it);
+    }
+
+    [Server]
     private void StartNewRound(PlayerController it)
     {
         currentIt = it;

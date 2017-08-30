@@ -14,6 +14,8 @@ public class PlayerIt : NetworkBehaviour
     private GameObject muzzleFlashPrefab;
     [SerializeField]
     private Transform muzzleLocation;
+    [SerializeField]
+    private LineRenderer shootLine;
 
 
     private TaggedAreaControl tagArea;
@@ -22,6 +24,7 @@ public class PlayerIt : NetworkBehaviour
     private void Start()
     {
         tagArea = GameObject.FindGameObjectWithTag("TagArea").GetComponent<TaggedAreaControl>();
+        shootLine.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -63,5 +66,22 @@ public class PlayerIt : NetworkBehaviour
     {
         //show particle effect, play sound
         Instantiate(this.muzzleFlashPrefab, this.muzzleLocation.position, this.muzzleLocation.rotation);
+        if (hitSomething)
+        {
+            shootLine.SetPosition(1, hitLocation);
+        }
+        else
+        {
+            Debug.Log("Couldn't hit the broad side of a barn. From the inside. With the door closed!");
+            shootLine.SetPosition(1, firePosition.position + firePosition.forward * 20f);
+        }
+        shootLine.SetPosition(0, muzzleLocation.position);
+        shootLine.gameObject.SetActive(true);
+        Invoke("DisableShootLine", 1);
+    }
+
+    void DisableShootLine()
+    {
+        shootLine.gameObject.SetActive(false);
     }
 }

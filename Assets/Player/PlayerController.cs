@@ -5,6 +5,10 @@ using UnityEngine.Events;
 [System.Serializable]
 public class ToggleEvent: UnityEvent<bool> {}
 
+/**
+ * This script always remains active on the player, regardless of the status
+ * It coordinates the actions (and disables when necessary) the other scripts
+ */
 [RequireComponent(typeof(UnityStandardAssets.Characters.FirstPerson.FirstPersonController))]
 public class PlayerController : NetworkBehaviour
 {
@@ -60,6 +64,21 @@ public class PlayerController : NetworkBehaviour
 
         globalCamera = Camera.main.gameObject;
         EnablePlayer(true);
+    }
+
+    //cheat
+    private void Update()
+    {
+        if (Input.GetKeyDown("i"))
+        {
+            CmdRequestIt();
+        }
+    }
+
+    [Command]
+    private void CmdRequestIt()
+    {
+        GameCTRL.CheatRequestIt(this);
     }
 
     public override void OnStartServer()
