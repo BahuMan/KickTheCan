@@ -13,6 +13,9 @@ public class ToggleEvent: UnityEvent<bool> {}
 public class PlayerController : NetworkBehaviour
 {
 
+    public const int LAYER_DEFAULT = 0;
+    public const int LAYER_TAGGED = 9;
+
     [System.Serializable]
     public struct network
     {
@@ -39,7 +42,7 @@ public class PlayerController : NetworkBehaviour
     [SerializeField]
     tagStatusChange statusChanges;
 
-    public enum TagStatus { IT, TAGGED, HIDING };
+    public enum TagStatus { IT, TAGGED, HIDING, RESET_HIDING, RESET_IT };
 
     [SyncVar(hook="SetStatus")]
     public TagStatus status;
@@ -125,6 +128,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer) HUD.DisplayGameMessage("You're IT!", 5f);
 
+        this.gameObject.layer = LAYER_DEFAULT;
         statusChanges.onTogglePlayerTagged.Invoke(false);
         statusChanges.onTogglePlayerHiding.Invoke(false);
         //do the activations last, to make sure that no necessary component is turned off again:
@@ -135,6 +139,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer) HUD.DisplayGameMessage("Go HIDE!", 5f);
 
+        this.gameObject.layer = LAYER_DEFAULT;
         statusChanges.onTogglePlayerIt.Invoke(false);
         statusChanges.onTogglePlayerTagged.Invoke(false);
         //do the activations last, to make sure that no necessary component is turned off again:
@@ -145,6 +150,7 @@ public class PlayerController : NetworkBehaviour
     {
         if (isLocalPlayer) HUD.DisplayGameMessage("You've been tagged ...", 15f);
 
+        this.gameObject.layer = LAYER_TAGGED;
         statusChanges.onTogglePlayerIt.Invoke(false);
         statusChanges.onTogglePlayerHiding.Invoke(false);
         //do the activations last, to make sure that no necessary component is turned off again:
@@ -185,6 +191,6 @@ public class PlayerController : NetworkBehaviour
     [ClientRpc]
     private void RpcBroadcastChatMessage(string msg)
     {
-        this.HUD.AddChatLine(msg);
+        this.HUD.AddChatLine(this.name, msg);
     }
 }

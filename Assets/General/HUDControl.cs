@@ -59,11 +59,11 @@ public class HUDControl : NetworkBehaviour {
 
     }
 
-    public void AddChatLine(string chatLine)
+    public void AddChatLine(string player, string chatLine)
     {
         //@TODO: sanitize & censorize
         //@TODO: possible duplicate lines when host is also a player?
-        ChatLog.text += chatLine;
+        ChatLog.text += "<B><color=\"red\">" + player + ": </color></B>" + chatLine + '\n';
     }
 
     public void OnSubmit(UnityEngine.EventSystems.BaseEventData eventData)

@@ -11,12 +11,11 @@ Online Multiplayer Variant of the well-known children's game
 - when hiding or tagged, the gun disappears
 - added (stupid) bots
 - rudimentary chat
+- cross hair
+- TagArea only locks players inside if they have been tagged (some layers magic)
 
 # todo:
-- when all players were tagged, game gets reset but everyone remains locked in TagArea (duh)
-- bug, not glitch: in the 5 seconds "unlocked", players can put themselves on the wrong side of the fence (inside when they're not tagged, outside although they've been tagged (again, in the 5 seconds) ==> can we settle collisions with tags instead?
-- cross hair
 - HUD
 - gun should follow look (up and down as well as rotation)
-- camera shows vertical and horizontal black glitches
+- camera shows vertical and horizontal black glitches (probably due to 2 cameras active)
 - actual player models? (with NetworkAnimator)
