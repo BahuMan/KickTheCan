@@ -15,9 +15,11 @@ Online Multiplayer Variant of the well-known children's game
 - TagArea only locks players inside if they have been tagged (some layers magic)
 - BUGFIX: nullpointer on TagArea when tagging player
 - BUGFIX: TagArea playerlist now cleared when restarting game AND when releasing players
+- added 1  model (todo: strafing)
 
 # todo:
 - HUD
 - gun should follow look (up and down as well as rotation)
+- use lasso instead of gun?
 - camera shows vertical and horizontal black glitches (probably due to 2 cameras active)
-- actual player models? (with NetworkAnimator)
+- add multiple models for players when HIDING
