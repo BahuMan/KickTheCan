@@ -9,9 +9,11 @@ public class BotController: NetworkBehaviour
     private PlayerController _player;
     private PlayerIt _playerIt;
     private CharacterController _ctrl;
+    private NetworkAnimator _anim;
     private Transform _taggedArea;
     private Vector3 _movement;
     private float nextShot;
+    private bool _wasGrounded;
 
     public float ThinkInterval = 5f;
     public float FireInterval = 1;
@@ -24,6 +26,8 @@ public class BotController: NetworkBehaviour
         _playerIt = GetComponent<PlayerIt>();
         _player = GetComponent<PlayerController>();
         _ctrl = GetComponent<CharacterController>();
+        _anim = GetComponent<NetworkAnimator>();
+
         _gameController = GameObject.FindGameObjectWithTag("GameController").GetComponent<TagGameController>();
         _taggedArea = GameObject.FindGameObjectWithTag("TagArea").transform;
         transform.position = _taggedArea.position + Random.onUnitSphere * SpawnRadius + new Vector3(0, SpawnRadius, 0); ;
@@ -32,12 +36,23 @@ public class BotController: NetworkBehaviour
 
     public void Update()
     {
-        if (!_ctrl.isGrounded)
-        {
-            _ctrl.Move(transform.up * Time.deltaTime * -WalkSpeed);
-        }
-        _ctrl.Move(_movement * Time.deltaTime);
+
+        _ctrl.Move(-transform.up);
+        _anim.animator.SetBool("Grounded", _ctrl.isGrounded);
+
+        if (!_wasGrounded && _ctrl.isGrounded) _anim.SetTrigger("Land");
+        if (_wasGrounded && !_ctrl.isGrounded) _anim.SetTrigger("Jump");
+
         transform.LookAt(transform.position + _movement);
+        _wasGrounded = _ctrl.isGrounded;
+
+        if (_ctrl.isGrounded)
+        {
+            _anim.animator.SetFloat("MoveSpeed", _movement.sqrMagnitude);
+            _ctrl.Move(_movement * Time.deltaTime);
+        }
+
+
     }
 
     private IEnumerator SetGoal()
@@ -110,10 +125,6 @@ public class BotController: NetworkBehaviour
                     //also, shoot
                     _playerIt.CmdShoot(transform.position, _movement);
                     break;
-                }
-                else
-                {
-                    Debug.Log("Object obstructing clear shot at player " + player.name + ": " + info.transform.name);
                 }
             }
             else

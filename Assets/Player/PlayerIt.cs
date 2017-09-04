@@ -18,10 +18,10 @@ public class PlayerIt : NetworkBehaviour
     private LineRenderer shootLine;
 
 
-    private TaggedAreaControl tagArea;
+    public TaggedAreaControl tagArea;
     private float earliestNewShot = 0f;
 
-    private void Start()
+    public override void OnStartServer()
     {
         tagArea = GameObject.FindGameObjectWithTag("TagArea").GetComponent<TaggedAreaControl>();
         shootLine.gameObject.SetActive(false);
@@ -72,7 +72,6 @@ public class PlayerIt : NetworkBehaviour
         }
         else
         {
-            Debug.Log("Couldn't hit the broad side of a barn. From the inside. With the door closed!");
             shootLine.SetPosition(1, firePosition.position + firePosition.forward * 20f);
         }
         shootLine.SetPosition(0, muzzleLocation.position);

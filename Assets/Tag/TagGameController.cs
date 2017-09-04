@@ -36,7 +36,7 @@ public class TagGameController : NetworkBehaviour {
             return;
         }
 
-        if (currentIt == null)
+        if (currentIt == null) //happens when "it" quits network game
         {
             StartNewRound(playerList[Random.Range(0, playerList.Count)]);
         }
@@ -52,7 +52,7 @@ public class TagGameController : NetworkBehaviour {
         }
         else
         {
-            //game is on; no change
+            //Debug.Log("game is on; no change");
         }
     }
 
@@ -65,7 +65,15 @@ public class TagGameController : NetworkBehaviour {
     [Server]
     private void StartNewRound(PlayerController it)
     {
+        //first, change status of previous "it":
+        if (currentIt != null && currentIt.gameObject != it.gameObject)
+        {
+            currentIt.status = PlayerController.TagStatus.HIDING;
+        }
+
+
         currentIt = it;
+        Debug.Log("starting new round - " + it.name + " is IT");
         //@TODO: reset positions?
         foreach (PlayerController pc in playerList)
         {
@@ -78,6 +86,10 @@ public class TagGameController : NetworkBehaviour {
                 pc.status = PlayerController.TagStatus.HIDING;
             }
         }
+        //also, inform TagArea to clear everyone of their "taggged" list
+        //i'm doing a search for the tagarea rather than cacheing it
+        //so the method will also support changing scenes
+        GameObject.FindGameObjectWithTag("TagArea").GetComponent<TaggedAreaControl>().ClearTaggedPlayerList();
     }
 
     //used to check the generic list:

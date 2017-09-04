@@ -27,7 +27,25 @@ public class TaggedAreaControl : NetworkBehaviour
     public void AddTaggedPlayer(PlayerController playa)
     {
         playerList.Add(playa);
+        Debug.Log("adding player " + playa.name + ". Currently " + ListTaggedPlayers()); 
         playa.RpcTeleport(transform.position);
+    }
+
+    private string ListTaggedPlayers()
+    {
+        string sb = playerList.Count + " tagged players: ";
+        foreach (var tp in playerList)
+        {
+            sb += tp.name + ", ";
+        }
+        return sb;
+    }
+
+    [Server]
+    //called by the TagGameController when a new round starts
+    public void ClearTaggedPlayerList()
+    {
+        playerList.Clear();
     }
 
     [ServerCallback]
@@ -39,7 +57,8 @@ public class TaggedAreaControl : NetworkBehaviour
 
         if (playerList.Contains(player))
         {
-            Debug.LogError("someone was added but doesn't have status 'TAGGED' yet: " + player.name);
+            Debug.LogError(player.name + " didn't have status TAGGED but was in list: " + ListTaggedPlayers());
+            Debug.Break();
             return;
         }
 
@@ -52,7 +71,6 @@ public class TaggedAreaControl : NetworkBehaviour
             }
         }
         playerList.Clear();
-
         RpcReleaseAll();
     }
 
@@ -78,7 +96,8 @@ public class TaggedAreaControl : NetworkBehaviour
         foreach (GameObject b in barriers)
         {
             b.GetComponent<Renderer>().material = (locked ? this.BlockingMaterial : this.UnblockedMaterial);
-            b.GetComponent<Collider>().enabled = locked;
+            //colliders are now selective, so they don't need to be fully disabled anymore:
+            //b.GetComponent<Collider>().enabled = locked;
         }
     }
 }

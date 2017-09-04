@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Events;
+using UnityStandardAssets.CrossPlatformInput;
 
 [System.Serializable]
 public class ToggleEvent: UnityEvent<bool> {}
@@ -51,6 +52,9 @@ public class PlayerController : NetworkBehaviour
     private TagGameController GameCTRL;
     private HUDControl HUD;
 
+    private NetworkAnimator _anim;
+    private CharacterController _charCtrl;
+
 
 
     public void Start()
@@ -63,18 +67,30 @@ public class PlayerController : NetworkBehaviour
             //but only local player should listen for new
             //text input and broadcast that
             HUD.OnSendMessage += OnSendChatMessage;
+            _anim = GetComponent<NetworkAnimator>();
+            _charCtrl = GetComponent<CharacterController>();
         }
 
         globalCamera = Camera.main.gameObject;
         EnablePlayer(true);
     }
 
-    //cheat
     private void Update()
     {
-        if (Input.GetKeyDown("i"))
+        //the 'i' key is a cheat and should be removed from production code
+
+        if (isLocalPlayer)
         {
-            CmdRequestIt();
+            if (Input.GetKeyDown("i"))
+            {
+                Debug.Log("Requesting it");
+                CmdRequestIt();
+            }
+
+            float speed = CrossPlatformInputManager.GetAxis("Vertical");
+            _anim.animator.SetFloat("MoveSpeed", speed);
+            if (CrossPlatformInputManager.GetButtonDown("Jump")) _anim.SetTrigger("Jump");
+            _anim.animator.SetBool("Grounded", _charCtrl.isGrounded);
         }
     }
 
