@@ -13,9 +13,10 @@ Online Multiplayer Variant of the well-known children's game
 - rudimentary chat
 - cross hair
 - TagArea only locks players inside if they have been tagged (some layers magic)
+- BUGFIX: nullpointer on TagArea when tagging player
+- BUGFIX: TagArea playerlist now cleared when restarting game AND when releasing players
 
 # todo:
-- sometimes nullpointer on TagArea  when tagging a player
 - HUD
 - gun should follow look (up and down as well as rotation)
 - camera shows vertical and horizontal black glitches (probably due to 2 cameras active)
