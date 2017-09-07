@@ -21,5 +21,4 @@ Online Multiplayer Variant of the well-known children's game
 - HUD
 - gun should follow look (up and down as well as rotation)
 - use lasso instead of gun?
-- camera shows vertical and horizontal black glitches (probably due to 2 cameras active)
 - add multiple models for players when HIDING

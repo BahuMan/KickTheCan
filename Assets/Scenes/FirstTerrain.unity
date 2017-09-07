@@ -1688,7 +1688,7 @@ MonoBehaviour:
   m_ScriptCRCCheck: 1
   m_MaxDelay: 0.01
   m_LogLevel: 2
-  m_PlayerPrefab: {fileID: 1331065664831906, guid: a17f6d01d5138a040b6e7c9d7a142c69,
+  m_PlayerPrefab: {fileID: 1246982609618696, guid: f432eefe5613bb149ae86c511f36ae13,
     type: 2}
   m_AutoCreatePlayer: 1
   m_PlayerSpawnMethod: 1
@@ -1974,7 +1974,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   numBots: 4
-  PlayerPrefab: {fileID: 1331065664831906, guid: a17f6d01d5138a040b6e7c9d7a142c69,
+  PlayerPrefab: {fileID: 1246982609618696, guid: f432eefe5613bb149ae86c511f36ae13,
     type: 2}
 --- !u!4 &1921350152
 Transform:

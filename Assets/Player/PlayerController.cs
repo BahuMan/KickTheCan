@@ -113,10 +113,12 @@ public class PlayerController : NetworkBehaviour
         if (isLocalPlayer)
         {
             globalCamera.SetActive(!enabled);
+            networkOptions.onToggleRemote.Invoke(false);
             networkOptions.onToggleLocal.Invoke(enabled);
         }
         else
         {
+            networkOptions.onToggleLocal.Invoke(false);
             networkOptions.onToggleRemote.Invoke(enabled);
         }
 

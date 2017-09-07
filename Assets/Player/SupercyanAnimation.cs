@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class SupercyanAnimation : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    [SerializeField]
+    private Camera _cam;
+
+    private Animator _anim;
+
+    private void Start()
+    {
+        _anim = GetComponent<Animator>();
+    }
+
+    private void OnAnimatorIK(int layerIndex)
+    {
+        Debug.DrawLine(_cam.transform.position, _cam.transform.position - _cam.transform.forward);
+        _anim.SetLookAtPosition(_cam.transform.position - _cam.transform.forward);
+        _anim.SetLookAtWeight(1f);
+    }
 }

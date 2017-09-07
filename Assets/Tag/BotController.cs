@@ -48,7 +48,6 @@ public class BotController: NetworkBehaviour
 
         if (_ctrl.isGrounded)
         {
-            _anim.animator.SetFloat("MoveSpeed", _movement.sqrMagnitude);
             _ctrl.Move(_movement * Time.deltaTime);
         }
 
@@ -66,6 +65,8 @@ public class BotController: NetworkBehaviour
                 case PlayerController.TagStatus.IT: EvaluateIt(); break;
                 case PlayerController.TagStatus.HIDING: EvaluateHiding(); break;
             }
+            _anim.animator.SetFloat("MoveSpeed", _movement.magnitude);
+            //Debug.Log(gameObject.name + " going at " + _movement.sqrMagnitude);
         }
     }
 
