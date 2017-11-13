@@ -18,7 +18,7 @@ public class PlayerController : NetworkBehaviour
     public const int LAYER_TAGGED = 9;
 
     [System.Serializable]
-    public struct network
+    public struct NetworkOptionsConfig
     {
         [SerializeField]
         public ToggleEvent onToggleShared;
@@ -28,10 +28,10 @@ public class PlayerController : NetworkBehaviour
         public ToggleEvent onToggleRemote;
     }
     [SerializeField]
-    network networkOptions;
+    NetworkOptionsConfig networkOptions;
 
     [System.Serializable]
-    public struct tagStatusChange
+    public struct TagStatusChangeConfig
     {
         [SerializeField]
         public ToggleEvent onTogglePlayerIt;
@@ -41,7 +41,7 @@ public class PlayerController : NetworkBehaviour
         public ToggleEvent onTogglePlayerTagged;
     }
     [SerializeField]
-    tagStatusChange statusChanges;
+    TagStatusChangeConfig statusChanges;
 
     public enum TagStatus { IT, TAGGED, HIDING, RESET_HIDING, RESET_IT };
 
@@ -63,10 +63,6 @@ public class PlayerController : NetworkBehaviour
         HUD = go.GetComponent<HUDControl>();
         if (isLocalPlayer)
         {
-            //every player can send new messages to chat box,
-            //but only local player should listen for new
-            //text input and broadcast that
-            HUD.OnSendMessage += OnSendChatMessage;
             _anim = GetComponent<NetworkAnimator>();
             _charCtrl = GetComponent<CharacterController>();
         }
@@ -107,11 +103,12 @@ public class PlayerController : NetworkBehaviour
         GameCTRL.RegisterPlayer(this);
     }
 
-    private void EnablePlayer(bool enabled)
+    public void EnablePlayer(bool enabled)
     {
         networkOptions.onToggleShared.Invoke(enabled);
         if (isLocalPlayer)
         {
+            HUD.RegisterLocalPlayer(this);
             globalCamera.SetActive(!enabled);
             networkOptions.onToggleRemote.Invoke(false);
             networkOptions.onToggleLocal.Invoke(enabled);
@@ -194,21 +191,5 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
-    private void OnSendChatMessage(string msg)
-    {
-        //this delegate should be called from the chat box, and only if this player was local and registered itself
-        CmdBroadcastChatMessage(msg);
-    }
 
-    [Command]
-    private void CmdBroadcastChatMessage(string msg)
-    {
-        RpcBroadcastChatMessage(msg);
-    }
-
-    [ClientRpc]
-    private void RpcBroadcastChatMessage(string msg)
-    {
-        this.HUD.AddChatLine(this.name, msg);
-    }
 }

@@ -200,6 +200,7 @@ GameObject:
   - component: {fileID: 95150211305736222}
   - component: {fileID: 114568971209128010}
   - component: {fileID: 114199374515304420}
+  - component: {fileID: 114428689890168050}
   m_Layer: 0
   m_Name: PlayerBoy
   m_TagString: Player
@@ -1932,6 +1933,17 @@ MonoBehaviour:
   muzzleLocation: {fileID: 4106516582692972}
   shootLine: {fileID: 120115768990586274}
   tagArea: {fileID: 0}
+--- !u!114 &114428689890168050
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1331065664831906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6511714ef1ad7444e8f552f8df6535d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114568971209128010
 MonoBehaviour:
   m_ObjectHideFlags: 1

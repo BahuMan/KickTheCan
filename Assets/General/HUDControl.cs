@@ -1,78 +1,60 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityStandardAssets.Characters.FirstPerson;
 
-public class HUDControl : NetworkBehaviour {
+public class HUDControl : MonoBehaviour {
 
     [SerializeField]
     private Text GameMessage;
     [SerializeField]
-    private Text ChatLog;
-    [SerializeField]
-    private InputField ChatInput;
+    private ChatView _ChatView;
 
-    [SerializeField]
-    private KeyCode ChatHotkey = KeyCode.Return;
-    [SerializeField]
-    private KeyCode ChatEscape = KeyCode.Escape;
-
-    private bool isChatting = false;
-
-    public delegate void SendMessageEvent(string msg);
-    public event SendMessageEvent OnSendMessage;
+    private PlayerController localPlayer;
+    private bool isChatting;
 
     private void Reset()
     {
         GameMessage =   GameObject.Find("GameMessage").GetComponent<Text>();
-        ChatLog =       GameObject.Find("ChatLog").GetComponent<Text>();
-        ChatInput =     GameObject.Find("ChatInput").GetComponent<InputField>();
+        _ChatView = GameObject.Find("HUD").GetComponent<ChatView>();
     }
 
     private void Update()
     {
-        if (isChatting)
+        if (isChatting) return;
+        if (localPlayer == null)
         {
-            if (Input.GetKeyDown(ChatEscape)) {
-                Debug.Log("ESC is considered cancel");
-                ChatInput.CancelInvoke();
-                ChatInput.DeactivateInputField();
-                isChatting = false;
-            }
-            if (Input.GetKeyDown(KeyCode.Return)) //return is hardcoded for submitting chatline
-            {
-                Debug.Log("Enter is considered submit");
-                isChatting = false;
-                ChatInput.DeactivateInputField();
-                //this.CmdAddChatLine(ChatInput.text);
-                if (OnSendMessage != null) OnSendMessage(ChatInput.text);
-            }
-        }
-        else
-        {
-            if (Input.GetKeyDown(ChatHotkey))
-            {
-                ChatInput.ActivateInputField();
-                isChatting = true;
-            }
+            //if there is no local player, there is no need for the GUI/Player interaction
+            this.enabled = false;
         }
 
+        if (Input.GetButtonDown("EnableGUI"))
+        {
+            //localPlayer.EnablePlayer(false);
+            localPlayer.GetComponent<FirstPersonController>().enabled = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            
+        }
+        else if (Input.GetButtonUp("EnableGUI"))
+        {
+            //localPlayer.EnablePlayer(true);
+            localPlayer.GetComponent<FirstPersonController>().enabled = true;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
-    public void AddChatLine(string player, string chatLine)
+    public void RegisterLocalPlayer(PlayerController p)
     {
-        //@TODO: sanitize & censorize
-        //@TODO: possible duplicate lines when host is also a player?
-        ChatLog.text += "<B><color=\"red\">" + player + ": </color></B>" + chatLine + '\n';
-    }
+        this.localPlayer = p;
+        this.enabled = true;
 
-    public void OnSubmit(UnityEngine.EventSystems.BaseEventData eventData)
-    {
-        Debug.Log("OnSubmit");
-        isChatting = false;
-        ChatInput.DeactivateInputField();
-        //this.CmdAddChatLine(ChatInput.text);
-        if (OnSendMessage != null) OnSendMessage(ChatInput.text);
+        //bind chat to local player:
+        PlayerChat pc = p.GetComponent<PlayerChat>();
+        _ChatView.OnSendMessage += pc.OnSendChatMessage;
+        //binding in other direction:
+        pc.OnReceivedMessageEvent += _ChatView.AddChatLine;
     }
 
     public void DisplayGameMessage(string msg, float time)
@@ -85,5 +67,11 @@ public class HUDControl : NetworkBehaviour {
         GameMessage.text = msg;
         yield return new WaitForSeconds(time);
         GameMessage.text = "";
+    }
+
+    private void SetChatMode(bool chat)
+    {
+        this.isChatting = chat;
+        localPlayer.EnablePlayer(!chat);
     }
 }

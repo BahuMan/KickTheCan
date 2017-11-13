@@ -182,6 +182,7 @@ GameObject:
   - component: {fileID: 95213388944781412}
   - component: {fileID: 114894911317590818}
   - component: {fileID: 114184363210753382}
+  - component: {fileID: 114019072106155280}
   m_Layer: 0
   m_Name: PlayerHorse
   m_TagString: Player
@@ -1969,6 +1970,17 @@ Animator:
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
+--- !u!114 &114019072106155280
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1246982609618696}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6511714ef1ad7444e8f552f8df6535d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114150682835973362
 MonoBehaviour:
   m_ObjectHideFlags: 1
