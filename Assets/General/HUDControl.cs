@@ -72,6 +72,8 @@ public class HUDControl : MonoBehaviour {
     private void SetChatMode(bool chat)
     {
         this.isChatting = chat;
-        localPlayer.EnablePlayer(!chat);
+        localPlayer.GetComponent<FirstPersonController>().enabled = !chat;
+        Cursor.lockState = chat? CursorLockMode.Locked: CursorLockMode.None;
+        Cursor.visible = chat;
     }
 }
