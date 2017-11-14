@@ -1,6 +1,9 @@
 # KickTheCan
 Online Multiplayer Variant of the well-known children's game
 
+# working on:
+- model picker
+
 # done:
 - local multiplayer host
 - clients can join
@@ -10,7 +13,7 @@ Online Multiplayer Variant of the well-known children's game
 - server assigns "it", other players are hiding (fixed)
 - when hiding or tagged, the gun disappears
 - added (stupid) bots
-- rudimentary chat
+- rudimentary chat (refactored, CTRL shows mouse cursor)
 - cross hair
 - TagArea only locks players inside if they have been tagged (some layers magic)
 - BUGFIX: nullpointer on TagArea when tagging player
