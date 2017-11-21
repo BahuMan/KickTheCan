@@ -11,37 +11,34 @@ public class HUDControl : MonoBehaviour {
     private ChatView _ChatView;
 
     private PlayerController localPlayer;
-    private bool isChatting;
+    private bool inGUI;
+
+    private void Start()
+    {
+        if (localPlayer == null)
+        {
+            //if there is no local player, there is no need for the GUI/Player interaction
+            this.enabled = false;
+        }
+    }
 
     private void Reset()
     {
+        //default for some variables, but this can be overwritten by level desiger:
         GameMessage =   GameObject.Find("GameMessage").GetComponent<Text>();
         _ChatView = GameObject.Find("HUD").GetComponent<ChatView>();
     }
 
     private void Update()
     {
-        if (isChatting) return;
-        if (localPlayer == null)
-        {
-            //if there is no local player, there is no need for the GUI/Player interaction
-            this.enabled = false;
-        }
-
         if (Input.GetButtonDown("EnableGUI"))
         {
-            //localPlayer.EnablePlayer(false);
-            localPlayer.GetComponent<FirstPersonController>().enabled = false;
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
+            SetGUIMode(true);
             
         }
         else if (Input.GetButtonUp("EnableGUI"))
         {
-            //localPlayer.EnablePlayer(true);
-            localPlayer.GetComponent<FirstPersonController>().enabled = true;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
+            SetGUIMode(false);
         }
     }
 
@@ -69,11 +66,12 @@ public class HUDControl : MonoBehaviour {
         GameMessage.text = "";
     }
 
-    private void SetChatMode(bool chat)
+    private void SetGUIMode(bool gui)
     {
-        this.isChatting = chat;
-        localPlayer.GetComponent<FirstPersonController>().enabled = !chat;
-        Cursor.lockState = chat? CursorLockMode.Locked: CursorLockMode.None;
-        Cursor.visible = chat;
+        this.inGUI = gui;
+        localPlayer.EnablePlayer(!gui);
+        //localPlayer.GetComponent<FirstPersonController>().enabled = !gui;
+        Cursor.lockState = gui? CursorLockMode.Locked: CursorLockMode.None;
+        Cursor.visible = gui;
     }
 }
